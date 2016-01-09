@@ -1,6 +1,7 @@
+#+TODO: NEXT | DONE
 * Get to Mars
 ** DONE Get funding
 ** NEXT Build a rocket                                       :@crypt:@lab:
 ** NEXT Hire an intern
-** WAITING Find out when a solar flare will happen
-
+** Find out when a solar flare will happen
+   

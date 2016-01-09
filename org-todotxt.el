@@ -40,6 +40,8 @@
 (defvar org-todotxt-get-contexts-function 'org-todotxt-get-contexts
   "The function used to resolve the contexts associated with an Org task.")
 
+(require 'subr-x)
+
 (defun org-todotxt-push (todotxt-file-name)
   "Push the Org file into the todotxt file."
   (interactive)
@@ -97,60 +99,6 @@ Uses the Org tags associated with this task."
           (contexts (funcall org-todotxt-get-contexts-function original-task-marker))
           (projects-names (funcall org-todotxt-get-projects-function original-task-marker)))
       (format "%s %s %s" headline projects-names contexts))))
-
-;;; Tests:
-
-(defun org-todotxt--test-find-org-file ()
-  "Open the test Org file."
-  (find-file-noselect "todotxt-test.org"))
-
-(defun org-todotxt--test-get-marker (match-text)
-  "Return the marker for MATCH-TEXT in the test org file."
-  (let* ((org-gtd-buffer (org-todotxt--test-find-org-file))
-         (task-marker (with-current-buffer org-gtd-buffer
-                        (goto-char (point-min))
-                        (search-forward match-text)
-                        (point-marker))))
-    task-marker))
-
-(defun org-todotxt--test-get-marker-build-rocket ()
-  (org-todotxt--test-get-marker "Build a rocket"))
-
-(defun org-todotxt--test-get-marker-hire-intern ()
-  (org-todotxt--test-get-marker "Hire an intern"))
-
-(defun org-todotxt--test-create-agenda ()
-  "Setup a specific Org Agenda buffer for testing purposes."
-  (interactive)
-  (let* ((org-gtd-buffer (org-todotxt--test-find-org-file)))
-    (with-current-buffer org-gtd-buffer
-      (put 'org-agenda-files 'org-restrict (list (buffer-file-name (buffer-base-buffer))))
-      (org-todo-list)
-      (put 'org-agenda-files 'org-restrict nil))))
-
-(ert-deftest org-todotxt-test--camel-case-project-name ()
-  (should (equal (org-todotxt--camel-case-project-name "Get to Mars")
-                 "GetToMars")))
-
-(ert-deftest org-todotxt-test--get-projects ()
-  (should (equal (org-todotxt-get-projects (org-todotxt--test-get-marker-build-rocket))
-                 "+GetToMars")))
-
-(ert-deftest org-todotxt-test--get-contexts ()
-  (should (equal (org-todotxt-get-contexts (org-todotxt--test-get-marker-build-rocket))
-                 "@crypt @lab"))
-  (should (equal (org-todotxt-get-contexts (org-todotxt--test-get-marker-hire-intern))
-                 "")))
-  
-(ert-deftest org-todotxt-test--convert-org-line-to-todotxt-line ()
-  (should (equal (org-todotxt--convert-org-line-to-todotxt-line (org-todotxt--test-get-marker-build-rocket))
-                 "Build a rocket +GetToMars @crypt @lab")))
-
-(ert-deftest org-todotxt-test-push ()
-  (let ((org-todotxt-create-agenda-function 'org-todotxt--test-create-agenda))
-    (org-todotxt-push "todo-test.txt")))
-
-;; (ert t)
 
 (provide 'org-todotxt)
 ;;; org-todotxt.el ends here
