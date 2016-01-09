@@ -31,6 +31,11 @@
 
 ;;; Code:
 
+(require 'org)
+(require 'subr-x)
+
+;; Useful vars
+
 (defvar org-todotxt-create-agenda-function 'org-todo-list
   "The function used to generate the list of TODO's for the todotxt file.")
 
@@ -40,12 +45,21 @@
 (defvar org-todotxt-get-contexts-function 'org-todotxt-get-contexts
   "The function used to resolve the contexts associated with an Org task.")
 
-(require 'subr-x)
+(defvar org-todotxt-auto-push-delay 10
+  "Number of seconds of Emacs inactivity before `org-todotxt-auto-push-with-delay' executes `org-todotxt-auto-push-function'.")
+
+(defvar org-todotxt-auto-push-function nil
+  "Function used to `org-todotxt-auto-push-with-delay' todotxt files after save.")
+
+(defvar org-todotxt-auto-push-file-list nil
+  "List of Org files on which `org-todotxt-after-save-hook' triggers `org-todotxt-auto-push-function'.")
+
+;; One-way push
 
 (defun org-todotxt-push (todotxt-file-name)
-  "Push the Org file into the todotxt file."
+  "Push the Org file into the TODOTXT-FILE-NAME file."
   (interactive)
-  
+
   (call-interactively org-todotxt-create-agenda-function)
 
   (let ((todotxt-buffer (generate-new-buffer " *todotxt temp file*" )))
@@ -62,7 +76,8 @@
         (forward-line))
       (with-current-buffer todotxt-buffer
         (write-region nil nil todotxt-file-name nil 0))
-      (kill-buffer todotxt-buffer))))
+      (kill-buffer todotxt-buffer)
+      (message "org-todotxt pushed to %s" todotxt-file-name))))
 
 (defun org-todotxt--camel-case-project-name (project-name)
   "Convert PROJECT-NAME into todotxt format.
@@ -99,6 +114,40 @@ Uses the Org tags associated with this task."
           (contexts (funcall org-todotxt-get-contexts-function original-task-marker))
           (projects-names (funcall org-todotxt-get-projects-function original-task-marker)))
       (format "%s %s %s" headline projects-names contexts))))
+
+;; auto-push
+
+(defvar org-todotxt-auto-push-timer nil
+  "Internal Timer that `org-todotxt-auto-push-with-delay' use to reschedule itself, or nil.")
+
+(defun org-todotxt-auto-push-with-delay ()
+  "Auto-push after `org-todotxt-auto-push-delay' seconds of Emacs inactivity."
+  (when org-todotxt-auto-push-timer
+    (cancel-timer org-todotxt-auto-push-timer))
+  (setq org-todotxt-auto-push-timer
+        (run-with-idle-timer
+         org-todotxt-auto-push-delay nil org-todotxt-auto-push-function)))
+
+(defun org-todotxt-after-save-hook ()
+  "`after-save-hook that selectively invokes `org-todotxt-auto-push-with-delay'."
+  (when (eq major-mode 'org-mode)
+    (dolist (file org-todotxt-auto-push-file-list)
+      (if (string= (expand-file-name file) (buffer-file-name))
+          (org-todotxt-auto-push-with-delay)))))
+
+(defun org-todotxt-install-after-save-hook ()
+  "Install an `after-save-hook' for org-todotxt.
+
+Triggers `org-todotxt-auto-push-function' after
+`org-todotxt-auto-push-delay' when any file in
+`org-todotxt-auto-push-file-list' changes."
+  (interactive)
+  (unless org-todotxt-auto-push-function
+    (error "Define org-todotxt-auto-push-function to your auto-push function"))
+  (unless org-todotxt-auto-push-file-list
+    (error "Specify the list of Org files that you want the after-save hook to apply in org-todotxt-auto-push-file-list"))
+
+  (add-hook 'after-save-hook 'org-todotxt-after-save-hook))
 
 (provide 'org-todotxt)
 ;;; org-todotxt.el ends here
