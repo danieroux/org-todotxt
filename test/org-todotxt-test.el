@@ -49,9 +49,18 @@
   (should (equal (org-todotxt-get-contexts (org-todotxt--test-get-marker-hire-intern))
                  "")))
 
+(ert-deftest org-todotxt-test--maybe-get-id ()
+  (setq org-todotxt-enable-sync t)
+  (should (equal (org-todotxt--maybe-get-id (org-todotxt--test-get-marker-build-rocket))
+                 " org-id:E544139F-E7AA-4D44-9616-8E8F5ED4DBDD"))
+  (setq org-todotxt-enable-sync nil)
+  (should (equal (org-todotxt--maybe-get-id (org-todotxt--test-get-marker-build-rocket))
+                 "")))
+
 (ert-deftest org-todotxt-test--convert-org-line-to-todotxt-line ()
+  (setq org-todotxt-enable-sync t)
   (should (equal (org-todotxt--convert-org-line-to-todotxt-line (org-todotxt--test-get-marker-build-rocket))
-                 "Build a rocket +GetToMars @crypt @lab")))
+                 "Build a rocket +GetToMars @crypt @lab org-id:E544139F-E7AA-4D44-9616-8E8F5ED4DBDD")))
 
 (ert-deftest org-todotxt-test-push ()
   (let ((org-todotxt-create-agenda-function 'org-todotxt--test-create-agenda))

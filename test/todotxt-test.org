@@ -2,6 +2,9 @@
 * Get to Mars
 ** DONE Get funding
 ** NEXT Build a rocket                                       :@crypt:@lab:
+   :PROPERTIES:
+   :ID:       E544139F-E7AA-4D44-9616-8E8F5ED4DBDD
+   :END:
 ** NEXT Hire an intern
 ** Find out when a solar flare will happen
    
