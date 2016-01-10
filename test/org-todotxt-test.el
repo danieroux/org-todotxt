@@ -2,11 +2,21 @@
   "Expand FILENAME from test directory."
   (expand-file-name filename (file-name-directory todotxt-current-file)))
 
+(defun org-todotxt--test-expand-input-file (filename)
+  "Expand FILENAME as an input file."
+  (org-todotxt--test-expand-file (concat "input-files/" filename)))
+
+(defun org-todotxt--test-expand-generated-file (filename)
+  "Expand FILENAME as an input file."
+  (org-todotxt--test-expand-file (concat "generated-files/" filename)))
+
 (setq todotxt-current-file (if load-in-progress load-file-name (buffer-file-name))
       source-directory (locate-dominating-file todotxt-current-file "Cask")
 
-      todotxt-file-test-org (org-todotxt--test-expand-file "todotxt-test.org")
-      todotxt-file-test-pull-to-org (org-todotxt--test-expand-file "todotxt-test-push.org"))
+      todotxt-file-test-org (org-todotxt--test-expand-input-file "todotxt-test.org")
+      todotxt-file-test-pull-to-org (org-todotxt--test-expand-generated-file "todotxt-test-push.org")
+
+      todotxt-file-test-pull-from-todotxt (org-todotxt--test-expand-input-file "todotxt-test-pull.txt"))
 
 (load (expand-file-name "org-todotxt.el" source-directory))
 
@@ -62,7 +72,7 @@
 
 (ert-deftest org-todotxt-test-push ()
   (let ((org-todotxt-create-agenda-function 'org-todotxt--test-create-agenda)
-        (push-to-file (org-todotxt--test-expand-file "todo-test-push.txt")))
+        (push-to-file (org-todotxt--test-expand-generated-file "todo-test-push.txt")))
     (org-todotxt-push push-to-file)
     (with-current-buffer
         (find-file push-to-file)
@@ -74,8 +84,7 @@
   "Not yet implemented."
   :expected-result :failed
   (copy-file todotxt-file-test-org todotxt-file-test-pull-to-org t)
-  (let ((pull-from-file (push-to-file (org-todotxt--test-expand-file "todo-test-pull.txt")))
-        (org-todotxt-files `(,todotxt-file-test-pull-to-org)))
-    (org-todotxt-pull pull-from-file)))
+  (let ((org-todotxt-files `(,todotxt-file-test-pull-to-org)))
+    (org-todotxt-pull todotxt-file-test-pull-from-todotxt)))
 
 ;; (ert t)
