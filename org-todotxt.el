@@ -36,6 +36,9 @@
 
 ;; Useful vars
 
+(defvar org-todotxt-inbox-for-pull nil
+  "All new tasks defined in the todotxt file will get pulled into this Org file.")
+
 (defvar org-todotxt-create-agenda-function 'org-todo-list
   "The function used to generate the list of TODO's for the todotxt file.")
 
@@ -124,6 +127,35 @@ Uses the Org tags associated with this task."
           (projects-names (funcall org-todotxt-get-projects-function original-task-marker))
           (maybe-id (org-todotxt--get-id original-task-marker)))
       (format "%s %s %s %s" headline projects-names contexts maybe-id))))
+
+;; pull
+
+(defun org-todotxt-pull--is-new-task-p ()
+  "Scan the line starting for org-id marker."
+  (save-excursion
+    (goto-char (point-at-bol))
+    (not (re-search-forward "org-id" (point-at-eol) t))))
+
+(defun org-todotxt-pull--new-task-from-line ()
+  (goto-char (point-at-bol))
+  (kill-line)
+  (with-current-buffer (find-file-noselect org-todotxt-inbox-for-pull)
+    (widen)
+    (goto-char (point-max))
+    (newline)
+    (insert "* ")
+    (yank)
+    (newline)
+    (save-buffer)))
+
+(defun org-todotxt-pull (from-todotxt-file)
+  (with-temp-buffer
+    (insert-file from-todotxt-file)
+    (goto-char 1))
+    (while (not (eobp))
+      (if (org-todotxt-pull--is-new-task-p)
+          (org-todotxt-pull--new-task-from-line))
+      (forward-line)))
 
 ;; auto-push
 

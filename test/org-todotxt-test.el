@@ -14,7 +14,8 @@
       source-directory (locate-dominating-file todotxt-current-file "Cask")
 
       todotxt-file-test-org (org-todotxt--test-expand-input-file "todotxt-test.org")
-      todotxt-file-test-pull-to-org (org-todotxt--test-expand-generated-file "todotxt-test-push.org")
+      todotxt-file-test-pull-to-org (org-todotxt--test-expand-generated-file "todotxt-test-pull.org")
+      todotxt-file-test-pull-to-org-inbox (org-todotxt--test-expand-generated-file "todotxt-test-pull-inbox.org")
 
       todotxt-file-test-pull-from-todotxt (org-todotxt--test-expand-input-file "todotxt-test-pull.txt"))
 
@@ -74,8 +75,7 @@
   (let ((org-todotxt-create-agenda-function 'org-todotxt--test-create-agenda)
         (push-to-file (org-todotxt--test-expand-generated-file "todo-test-push.txt")))
     (org-todotxt-push push-to-file)
-    (with-current-buffer
-        (find-file push-to-file)
+    (with-current-buffer (find-file-noselect push-to-file)
       (should (equal (count-lines (point-min) (point-max))
                      2))
       (should (search-forward "Build a rocket" nil t)))))
@@ -83,8 +83,31 @@
 (ert-deftest org-todotxt-test-pull ()
   "Not yet implemented."
   :expected-result :failed
-  (copy-file todotxt-file-test-org todotxt-file-test-pull-to-org t)
-  (let ((org-todotxt-files `(,todotxt-file-test-pull-to-org)))
-    (org-todotxt-pull todotxt-file-test-pull-from-todotxt)))
+  (if (file-exists-p todotxt-file-test-pull-to-org-inbox)
+      (delete-file todotxt-file-test-pull-to-org-inbox))
+  (let ((org-todotxt-inbox-for-pull todotxt-file-test-pull-to-org-inbox))
+    (org-todotxt-pull todotxt-file-test-pull-from-todotxt)
+    (with-current-buffer (find-file-noselect org-todotxt-inbox-for-pull)
+      (goto-char 1)
+      (should (search-forward "* Brilliant todo PHB captures on mobile device" nil t)))))
+
+(ert-deftest org-todotxt-test-pull--is-new-task-p ()
+  (with-temp-buffer
+    (insert "This is a new task")
+    (should (org-todotxt-pull--is-new-task-p))
+    (newline)
+    (insert "This is not a new task org-id:1233456-1234567")
+    (should-not (org-todotxt-pull--is-new-task-p))))
+
+(ert-deftest org-todotxt-test-pull--new-task-from-line ()
+  (if (file-exists-p todotxt-file-test-pull-to-org-inbox)
+      (delete-file todotxt-file-test-pull-to-org-inbox))
+  (let ((org-todotxt-inbox-for-pull todotxt-file-test-pull-to-org-inbox))
+    (with-temp-buffer
+      (insert "This is a new task")
+      (org-todotxt-pull--new-task-from-line))
+    (with-current-buffer (find-file-noselect todotxt-file-test-pull-to-org-inbox)
+      (goto-char 1)
+      (should (search-forward "* This is a new task" nil t)))))
 
 ;; (ert t)
