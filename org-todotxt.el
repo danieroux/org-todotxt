@@ -88,11 +88,11 @@
 todotxt expects project names to be one word, CamelCased."
   (replace-regexp-in-string " " "" (capitalize project-name)))
 
-(defmacro with-org-task (original-task-marker &rest body)
-  "Go to task."
+(defmacro with-org-task (task-marker &rest body)
+  "Save state, goto TASK-MARKER and execute BODY forms."
   (declare (indent 1) (debug t))
-  `(with-current-buffer (marker-buffer ,original-task-marker)
-     (goto-char (marker-position ,original-task-marker))
+  `(with-current-buffer (marker-buffer ,task-marker)
+     (goto-char (marker-position ,task-marker))
      ,@body))
 
 (defun org-todotxt-get-projects (original-task-marker)
