@@ -54,9 +54,6 @@
 (defvar org-todotxt-auto-push-file-list nil
   "List of Org files on which `org-todotxt-after-save-hook' triggers `org-todotxt-auto-push-function'.")
 
-(defvar org-todotxt-enable-sync nil
-  "Currently only used to indicate whether to add org-id's to todotxt tasks or not.")
-
 ;; One-way push
 
 (defun org-todotxt-push (todotxt-file-name)
@@ -114,11 +111,9 @@ Uses the Org tags associated with this task."
         (mapconcat 'identity tags " ")
       "")))
 
-(defun org-todotxt--maybe-get-id (original-task-marker)
-  (if (not org-todotxt-enable-sync)
-      ""
-    (with-org-task original-task-marker
-      (format " org-id:%s" (org-id-get-create)))))
+(defun org-todotxt--get-id (original-task-marker)
+  (with-org-task original-task-marker
+    (format "org-id:%s" (org-id-get-create))))
 
 (defun org-todotxt--convert-org-line-to-todotxt-line (original-task-marker)
   "Turn marker ORIGINAL-TASK-MARKER to an Org file line into a todotxt line."
@@ -127,8 +122,8 @@ Uses the Org tags associated with this task."
     (let ((headline (nth 4 (org-heading-components)))
           (contexts (funcall org-todotxt-get-contexts-function original-task-marker))
           (projects-names (funcall org-todotxt-get-projects-function original-task-marker))
-          (maybe-id (org-todotxt--maybe-get-id original-task-marker)))
-      (format "%s %s %s%s" headline projects-names contexts maybe-id))))
+          (maybe-id (org-todotxt--get-id original-task-marker)))
+      (format "%s %s %s %s" headline projects-names contexts maybe-id))))
 
 ;; auto-push
 
