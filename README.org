@@ -1,3 +1,33 @@
+* What this is
+An early stage two way sync between Org and http://todotxt.com. 
+
+* Philosophy
+Org is the canonical source. All the todotxt files are projections.
+
+Keeps out of your Org files. Will never directly edit them. Only exception is org-todotxt-inbox-for-pull where new tasks are appended to. I strongly suggest that is a separate Org file.
+
+* Example configuration
+#+BEGIN_SRC elisp
+(defun djr/org-todotxt-auto-push-all-agendas ()
+  (interactive)
+  (org-todotxt-sync "~/Dropbox/Apps/Simpletask App Folder/todo.txt")
+  (org-todotxt-push "~/Dropbox/todo/clockwork-todo.txt"))
+
+(setq org-todotxt-auto-push-function 'djr/org-todotxt-auto-push-all-agendas
+      org-todotxt-auto-push-delay 1
+      org-todotxt-auto-push-file-list '("~/Dropbox/Documents/gtd/gtd.org")
+      org-todotxt-inbox-for-pull "~/Dropbox/Documents/gtd/inbox.org")
+#+END_SRC
 * TODO
-** Consider https://github.com/lewang/flx
-   Instead of org-id generation and matching
+
+Roughly in order of interest to me:
+
+** Selectively strip out Org Links
+- Keep http links and titles, they are useful in the context of a todotxt file
+- Strip out probably all other org-link-types
+** Honour dates when pulling in new tasks
+** Pull in done markers (x) and mark tasks as DONE in Org files
+** Pull in when the Context changes
+** Pull in when the Project changes
+** Pull in due date for all tasks
+** Consider https://github.com/lewang/flx instead of org-id generation for matching tasks
