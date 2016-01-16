@@ -1,23 +1,33 @@
 * What this is
 An early stage two way sync between Org and http://todotxt.com. 
 
+Pull requests and bug reports very welcome, of course.
+
 * Philosophy
 Org is the canonical source. All the todotxt files are projections.
 
 Keeps out of your Org files. Will never directly edit them. Only exception is org-todotxt-inbox-for-pull where new tasks are appended to. I strongly suggest that is a separate Org file.
 
 * Example configuration
+
 #+BEGIN_SRC elisp
 (defun djr/org-todotxt-auto-push-all-agendas ()
   (interactive)
+  ;; Sync in new tasks from this file and then push out
   (org-todotxt-sync "~/Dropbox/Apps/Simpletask App Folder/todo.txt")
+  ;; Just push out to this file, overwriting whatever was there every time.
   (org-todotxt-push "~/Dropbox/todo/clockwork-todo.txt"))
 
+;; Check the docstrings for these variables
 (setq org-todotxt-auto-push-function 'djr/org-todotxt-auto-push-all-agendas
       org-todotxt-auto-push-delay 1
       org-todotxt-auto-push-file-list '("~/Dropbox/Documents/gtd/gtd.org")
       org-todotxt-inbox-for-pull "~/Dropbox/Documents/gtd/inbox.org")
+
+;; Use settings above and install an auto-push hook
+(org-todotxt-install-after-save-hook)
 #+END_SRC
+
 * TODO
 
 Roughly in order of interest to me:
