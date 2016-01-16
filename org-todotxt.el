@@ -57,12 +57,22 @@
 (defvar org-todotxt-auto-push-file-list nil
   "List of Org files on which `org-todotxt-after-save-hook' triggers `org-todotxt-auto-push-function'.")
 
-;; One-way push
+;; Sync
+
+(defun org-todotxt-sync (todotxt-file)
+  "Pulls in any new tasks from TODOTXT-FILE into `org-todotxt-inbox-for-pull' and then pushes the result of `org-todotxt-create-agenda-function' into it.
+
+New tasks are defined as any task without an org-id marker."
+  (interactive)
+  (unless org-todotxt-inbox-for-pull
+    (error "Define the Org file where new tasks should be pulled into in `org-todotxt-inbox-for-pull"))
+  (org-todotxt-pull todotxt-file)
+  (org-todotxt-push todotxt-file))
+
+;; Push
 
 (defun org-todotxt-push (todotxt-file-name)
   "Push the Org file into the TODOTXT-FILE-NAME file."
-  (interactive)
-
   (call-interactively org-todotxt-create-agenda-function)
 
   (let ((todotxt-buffer (generate-new-buffer " *todotxt temp file*" )))
@@ -128,7 +138,7 @@ Uses the Org tags associated with this task."
           (maybe-id (org-todotxt--get-id original-task-marker)))
       (format "%s %s %s %s" headline projects-names contexts maybe-id))))
 
-;; pull
+;; Pull
 
 (defun org-todotxt-pull--is-new-task-p ()
   "Scan the line starting for org-id marker."
