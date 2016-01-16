@@ -60,7 +60,7 @@
 ;; Sync
 
 (defun org-todotxt-sync (todotxt-file)
-  "Pulls in any new tasks from TODOTXT-FILE into `org-todotxt-inbox-for-pull' and then pushes the result of `org-todotxt-create-agenda-function' into it.
+  "Pulls in any new tasks from TODOTXT-FILE into `org-todotxt-inbox-for-pull' and then overwrite it with the result of `org-todotxt-create-agenda-function'.
 
 New tasks are defined as any task without an org-id marker."
   (interactive)
@@ -160,12 +160,12 @@ Uses the Org tags associated with this task."
 
 (defun org-todotxt-pull (from-todotxt-file)
   (with-temp-buffer
-    (insert-file from-todotxt-file)
-    (goto-char 1))
+    (insert-file-contents-literally from-todotxt-file)
+    (goto-char 1)
     (while (not (eobp))
       (if (org-todotxt-pull--is-new-task-p)
           (org-todotxt-pull--new-task-from-line))
-      (forward-line)))
+      (forward-line))))
 
 ;; auto-push
 

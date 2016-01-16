@@ -85,7 +85,7 @@
       (delete-file todotxt-file-test-pull-to-org-inbox))
   (let ((org-todotxt-inbox-for-pull todotxt-file-test-pull-to-org-inbox))
     (org-todotxt-pull todotxt-file-test-pull-from-todotxt)
-    (with-current-buffer (find-file-literally org-todotxt-inbox-for-pull)
+    (with-current-buffer (find-file-noselect org-todotxt-inbox-for-pull)
       (goto-char 1)
       (should (search-forward "* Brilliant todo PHB captures on mobile device" nil t))
       (kill-buffer))))
