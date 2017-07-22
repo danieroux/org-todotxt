@@ -3,5 +3,7 @@
 
 (package-file "org-todotxt.el")
 
+(depends-on "async")
+
 (development
  (depends-on "ert-runner"))

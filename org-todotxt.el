@@ -160,7 +160,7 @@ Uses the Org tags associated with this task."
 
 (defun org-todotxt-pull (from-todotxt-file)
   (with-temp-buffer
-    (insert-file-contents-literally from-todotxt-file)
+    (insert-file-contents from-todotxt-file)
     (goto-char 1)
     (while (not (eobp))
       (if (org-todotxt-pull--is-new-task-p)

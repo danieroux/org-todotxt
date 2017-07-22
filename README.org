@@ -28,6 +28,9 @@ Keeps out of your Org files. Will never directly edit them. Only exception is or
 (org-todotxt-install-after-save-hook)
 #+END_SRC
 
+* Also see
+- https://github.com/rpdillon/todotxt.el
+
 * What still needs to be done
 
 Roughly in order of interest to me:
@@ -40,4 +43,7 @@ Roughly in order of interest to me:
 ** Pull in when the Context changes
 ** Pull in when the Project changes
 ** Pull in due date for all tasks
+** Push out priorities
+** Pull in priorities
 ** Consider https://github.com/lewang/flx instead of org-id generation for matching tasks
+
