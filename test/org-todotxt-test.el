@@ -40,6 +40,9 @@
 (defun org-todotxt--test-get-marker-hire-intern ()
   (org-todotxt--test-get-marker "Hire an intern"))
 
+(defun org-todotxt--test-get-marker-is-it-done-yet ()
+  (org-todotxt--test-get-marker "Is it done yet?"))
+
 (defun org-todotxt--test-create-agenda ()
   "Setup a specific Org Agenda buffer for testing purposes."
   (interactive)
@@ -71,13 +74,21 @@
   (should (equal (org-todotxt--convert-org-line-to-todotxt-line (org-todotxt--test-get-marker-build-rocket))
                  "Build a rocket +GetToMars @crypt @lab org-id:E544139F-E7AA-4D44-9616-8E8F5ED4DBDD")))
 
+(ert-deftest org-todotxt-test-possibly-remove-link-keep-description ()
+  (should (equal (org-todotxt--possibly-remove-link-keep-description "[[id:12345][My link description]]")
+                 "My link description")))
+
+(ert-deftest org-todotxt-test--remove-org-links-and-keep-text ()
+  (should (equal (org-todotxt--convert-org-line-to-todotxt-line (org-todotxt--test-get-marker-is-it-done-yet))
+                 "Is it done yet? +GetToMars @lab org-id:4DC56F65-A74E-46C4-A778-748EC769DD9D")))
+
 (ert-deftest org-todotxt-test-push ()
   (let ((org-todotxt-create-agenda-function 'org-todotxt--test-create-agenda)
         (push-to-file (org-todotxt--test-expand-generated-file "todo-test-push.txt")))
     (org-todotxt-push push-to-file)
     (with-current-buffer (find-file-noselect push-to-file)
       (should (equal (count-lines (point-min) (point-max))
-                     2))
+                     3))
       (should (search-forward "Build a rocket" nil t)))))
 
 (ert-deftest org-todotxt-test-pull ()

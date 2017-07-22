@@ -128,15 +128,19 @@ Uses the Org tags associated with this task."
   (with-org-task original-task-marker
     (format "org-id:%s" (org-id-get-create))))
 
+(defun org-todotxt--possibly-remove-link-keep-description (headline)
+  (replace-regexp-in-string "\\[\\[.*\\]\\[\\(.*\\)\\]\\]" "\\1" headline))
+
 (defun org-todotxt--convert-org-line-to-todotxt-line (original-task-marker)
   "Turn marker ORIGINAL-TASK-MARKER to an Org file line into a todotxt line."
   (with-org-task original-task-marker
     (goto-char (marker-position original-task-marker))
-    (let ((headline (nth 4 (org-heading-components)))
-          (contexts (funcall org-todotxt-get-contexts-function original-task-marker))
-          (projects-names (funcall org-todotxt-get-projects-function original-task-marker))
-          (maybe-id (org-todotxt--get-id original-task-marker)))
-      (format "%s %s %s %s" headline projects-names contexts maybe-id))))
+    (let* ((headline (nth 4 (org-heading-components)))
+           (headline-no-link (org-todotxt--possibly-remove-link-keep-description headline))
+           (contexts (funcall org-todotxt-get-contexts-function original-task-marker))
+           (projects-names (funcall org-todotxt-get-projects-function original-task-marker))
+           (maybe-id (org-todotxt--get-id original-task-marker)))
+      (format "%s %s %s %s" headline-no-link projects-names contexts maybe-id))))
 
 ;; Pull
 

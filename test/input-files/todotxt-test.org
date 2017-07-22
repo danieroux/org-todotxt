@@ -6,5 +6,9 @@
    :ID:       E544139F-E7AA-4D44-9616-8E8F5ED4DBDD
    :END:
 ** NEXT Hire an intern
+** NEXT [[mu4e:msgid:etede.5663adf3.4db2afca.35c4@macbook.local][Is it done yet?]]   :@lab:
+   :PROPERTIES:
+   :ID:       4DC56F65-A74E-46C4-A778-748EC769DD9D
+   :END:
 ** Find out when a solar flare will happen
    
