@@ -39,7 +39,7 @@
 (defvar org-todotxt-inbox-for-pull nil
   "All new tasks defined in the todotxt file will get pulled into this Org file.")
 
-(defvar org-todotxt-create-agenda-function 'org-todo-list
+(defvar org-todotxt-create-agenda-function 'org-todotxt-create-org-todo-list-and-delete-window
   "The function used to generate the list of TODO's for the todotxt file.")
 
 (defvar org-todotxt-get-projects-function 'org-todotxt-get-projects
@@ -91,6 +91,14 @@ New tasks are defined as any task without an org-id marker."
         (write-region nil nil todotxt-file-name nil 0))
       (kill-buffer todotxt-buffer)
       (message "org-todotxt pushed to %s" todotxt-file-name))))
+
+(defun org-todotxt-create-org-todo-list-and-delete-window ()
+  "Default function for creating the agenda that will be pushed.
+
+Explicitly deletes the window, because the user did not request this action."
+  (interactive)
+  (org-todo-list)
+  (delete-window))
 
 (defun org-todotxt--camel-case-project-name (project-name)
   "Convert PROJECT-NAME into todotxt format.
