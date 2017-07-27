@@ -29,7 +29,7 @@ Keeps out of your Org files. Will never directly edit them. Only exception is or
 #+END_SRC
 
 * Also see
-- https://github.com/rpdillon/todotxt.el
+- https://github.com/rpdillon/todotxt.el - Skip the whole OrgMode thing, and just work directly with a plain todo.txt file.
 
 * What still needs to be done
 
@@ -37,7 +37,7 @@ Roughly in order of interest to me:
 
 ** Selectively strip out Org Links
 - Keep http links and titles, they are useful in the context of a todotxt file
-- Strip out probably all other org-link-types
+x Strip out probably all other org-link-types
 ** Honour dates when pulling in new tasks
 ** Pull in done markers (x) and mark tasks as DONE in Org files
 ** Pull in when the Context changes
