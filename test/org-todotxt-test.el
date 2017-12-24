@@ -3,12 +3,23 @@
   (expand-file-name filename (file-name-directory todotxt-current-file)))
 
 (defun org-todotxt--test-expand-input-file (filename)
-  "Expand FILENAME as an input file."
-  (org-todotxt--test-expand-file (concat "input-files/" filename)))
+  "Expand FILENAME as an input file.
+
+Make a copy of the input file into a staging area so that OrgMode can't change it."
+  (let* ((input-filename (concat "input-files/" filename))
+         (staging-filename (concat "staging-files/" filename)))
+    (progn
+      (ignore-errors (make-directory "staging-files"))
+      (copy-file (org-todotxt--test-expand-file input-filename)
+                 (org-todotxt--test-expand-file staging-filename)
+                 t)
+      (org-todotxt--test-expand-file staging-filename))))
 
 (defun org-todotxt--test-expand-generated-file (filename)
-  "Expand FILENAME as an input file."
-  (org-todotxt--test-expand-file (concat "generated-files/" filename)))
+  "Possibly close buffer of FILENAME and then expand FILENAME as a generated file."
+  (progn
+    (ignore-errors (kill-buffer filename))
+    (org-todotxt--test-expand-file (concat "generated-files/" filename))))
 
 (setq todotxt-current-file (if load-in-progress load-file-name (buffer-file-name))
       source-directory (locate-dominating-file todotxt-current-file "Cask")

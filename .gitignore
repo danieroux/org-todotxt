@@ -3,3 +3,4 @@ dist
 
 /org-todotxt-pkg.el
 /test/generated-files
+/test/staging-files
