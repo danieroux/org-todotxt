@@ -214,4 +214,8 @@ Triggers `org-todotxt-auto-push-function' after
   (add-hook 'after-save-hook 'org-todotxt-after-save-hook))
 
 (provide 'org-todotxt)
+
+;; To install this right now:
+;; (package-install-from-buffer)
+
 ;;; org-todotxt.el ends here
