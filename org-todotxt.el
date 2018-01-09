@@ -1,6 +1,4 @@
-;;; -*- lexical-binding: t -*-
-
-;;; org-todotxt.el --- One-way http://todotxt.net integration for Org-mode
+;;; org-todotxt.el --- One-way http://todotxt.net integration for Org-mode -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016 Free Software Foundation, Inc.
 
