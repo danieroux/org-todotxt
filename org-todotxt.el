@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;;; org-todotxt.el --- One-way http://todotxt.net integration for Org-mode
 
 ;; Copyright (C) 2016 Free Software Foundation, Inc.
@@ -71,23 +73,31 @@ New tasks are defined as any task without an org-id marker."
 
 ;; Push
 
+(require 'generator)
+
+(iter-defun iterate-over-tasks-in-org-agenda-buffer ()
+  "Assumes that this iterator is yielding in a with-current-buffer or similar block."
+  (declare (indent 1))
+
+  (while (not (eobp))
+    (if-let ((original-task-marker
+              (or (get-text-property (point) 'org-hd-marker)
+                  (get-text-property (point) 'org-marker))))
+        (iter-yield original-task-marker))
+    (forward-line)))
+
 (defun org-todotxt-push (todotxt-file-name)
   "Push the Org file into the TODOTXT-FILE-NAME file."
   (call-interactively org-todotxt-create-agenda-function)
 
   (let ((todotxt-buffer (generate-new-buffer " *todotxt temp file*" )))
-    (progn 
+    (progn
       (with-current-buffer org-agenda-buffer
         (goto-char (point-min))
-        (while (not (eobp))
-          (if-let ((original-task-marker
-                    (or (get-text-property (point) 'org-hd-marker)
-                        (get-text-property (point) 'org-marker))))
-              (progn
-                (with-current-buffer todotxt-buffer
-                  (insert (org-todotxt--convert-org-line-to-todotxt-line original-task-marker))
-                  (newline))))
-          (forward-line)))
+        (iter-do (original-task-marker (iterate-over-tasks-in-org-agenda-buffer))
+                 (with-current-buffer todotxt-buffer
+                   (insert (org-todotxt--convert-org-line-to-todotxt-line original-task-marker))
+                   (newline))))
       (with-current-buffer todotxt-buffer
         (write-region nil nil todotxt-file-name nil 0))
       (kill-buffer todotxt-buffer)
