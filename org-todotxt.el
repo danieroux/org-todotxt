@@ -139,8 +139,8 @@ Uses the Org tags associated with this task."
 (defun org-todotxt--possibly-remove-link-keep-description (headline)
   (replace-regexp-in-string "\\[\\[.*\\]\\[\\(.*\\)\\]\\]" "\\1" headline))
 
-(defun org-todotxt--convert-org-line-to-todotxt-line (original-task-marker)
-  "Turn marker ORIGINAL-TASK-MARKER to an Org file line into a todotxt line."
+(defun org-todotxt--extract-info-from-org-line (original-task-marker then-call-this)
+  "Extract information from ORIGINAL-TASK-MARKER and call the THEN-CALL-THIS function with that information as arguments."
   (with-org-task original-task-marker
     (goto-char (marker-position original-task-marker))
     (let* ((headline (nth 4 (org-heading-components)))
@@ -148,7 +148,13 @@ Uses the Org tags associated with this task."
            (contexts (funcall org-todotxt-get-contexts-function original-task-marker))
            (projects-names (funcall org-todotxt-get-projects-function original-task-marker))
            (maybe-id (org-todotxt--get-id original-task-marker)))
-      (format "%s %s %s %s" headline-no-link projects-names contexts maybe-id))))
+      (funcall then-call-this headline-no-link projects-names contexts maybe-id))))
+
+(defun org-todotxt--convert-org-line-to-todotxt-line (original-task-marker)
+  "Turn marker ORIGINAL-TASK-MARKER to an Org file line into a todotxt line."
+  (org-todotxt--extract-info-from-org-line original-task-marker
+                                           (lambda (headline-no-link projects-names contexts maybe-id)
+                                             (format "%s %s %s %s" headline-no-link projects-names contexts maybe-id))))
 
 ;; Pull
 
