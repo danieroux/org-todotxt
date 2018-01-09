@@ -175,8 +175,6 @@ Uses the Org tags associated with this task."
     (goto-char (point-at-bol))
     (not (re-search-forward "org-id" (point-at-eol) t))))
 
-(org-todotxt--get-hash-of-active-org-tasks org-agenda-buffer)
-
 (defun org-todotxt--get-hash-of-active-org-tasks (some-org-buffer)
   (setq so-much-imperative-list '())
 
@@ -195,10 +193,10 @@ Uses the Org tags associated with this task."
   (with-current-buffer (find-file-noselect org-todotxt-inbox-for-pull)
     (widen)
     (goto-char (point-max))
-    (newline)
+    (if (not (bolp))
+        (newline))
     (insert "* ")
     (yank)
-    (newline)
     (save-buffer)))
 
 (defun org-todotxt-pull (from-todotxt-file)

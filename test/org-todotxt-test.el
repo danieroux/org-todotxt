@@ -105,13 +105,13 @@ Make a copy of the input file into a staging area so that OrgMode can't change i
 (ert-deftest org-todotxt-test-pull ()
   (if (file-exists-p todotxt-file-test-pull-to-org-inbox)
       (delete-file todotxt-file-test-pull-to-org-inbox))
+
   (let ((org-todotxt-inbox-for-pull todotxt-file-test-pull-to-org-inbox))
     (org-todotxt-pull todotxt-file-test-pull-from-todotxt)
     (with-current-buffer (find-file-noselect org-todotxt-inbox-for-pull)
       (goto-char 1)
       (should (search-forward "* Brilliant todo PHB captures on mobile device" nil t))
-      ;; With a space
-      (should (= 2 (count-lines (point-min) (point-max))))
+      (should (= 1 (count-lines (point-min) (point-max))))
       (kill-buffer))))
 
 (ert-deftest org-todotxt-test--get-hash-of-active-org-tasks ()
@@ -129,15 +129,15 @@ Make a copy of the input file into a staging area so that OrgMode can't change i
     (insert "This is not a new task org-id:1233456-1234567")
     (should-not (org-todotxt-pull--is-new-task-p))))
 
-(ert-deftest org-todotxt-test-pull--new-task-from-line ()
-  (if (file-exists-p todotxt-file-test-pull-to-org-inbox)
-      (delete-file todotxt-file-test-pull-to-org-inbox))
-  (let ((org-todotxt-inbox-for-pull todotxt-file-test-pull-to-org-inbox))
-    (with-temp-buffer
-      (insert "This is a new task")
-      (org-todotxt-pull--new-task-from-line))
-    (with-current-buffer (find-file-noselect todotxt-file-test-pull-to-org-inbox)
-      (goto-char 1)
-      (should (search-forward "* This is a new task" nil t)))))
+;; (ert-deftest org-todotxt-test-pull--new-task-from-line ()
+;;   (if (file-exists-p todotxt-file-test-pull-to-org-inbox)
+;;       (delete-file todotxt-file-test-pull-to-org-inbox))
+;;   (let ((org-todotxt-inbox-for-pull todotxt-file-test-pull-to-org-inbox))
+;;     (with-temp-buffer
+;;       (insert "This is a new task")
+;;       (org-todotxt-pull--new-task-from-line))
+;;     (with-current-buffer (find-file-noselect todotxt-file-test-pull-to-org-inbox)
+;;       (goto-char 1)
+;;       (should (search-forward "* This is a new task" nil t)))))
 
 ;; (ert t)
