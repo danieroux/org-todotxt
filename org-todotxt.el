@@ -76,17 +76,18 @@ New tasks are defined as any task without an org-id marker."
   (call-interactively org-todotxt-create-agenda-function)
 
   (let ((todotxt-buffer (generate-new-buffer " *todotxt temp file*" )))
-    (with-current-buffer org-agenda-buffer
-      (goto-char (point-min))
-      (while (not (eobp))
-        (if-let ((original-task-marker
-                  (or (get-text-property (point) 'org-hd-marker)
-                      (get-text-property (point) 'org-marker))))
-            (progn
-              (with-current-buffer todotxt-buffer
-                (insert (org-todotxt--convert-org-line-to-todotxt-line original-task-marker))
-                (newline))))
-        (forward-line))
+    (progn 
+      (with-current-buffer org-agenda-buffer
+        (goto-char (point-min))
+        (while (not (eobp))
+          (if-let ((original-task-marker
+                    (or (get-text-property (point) 'org-hd-marker)
+                        (get-text-property (point) 'org-marker))))
+              (progn
+                (with-current-buffer todotxt-buffer
+                  (insert (org-todotxt--convert-org-line-to-todotxt-line original-task-marker))
+                  (newline))))
+          (forward-line)))
       (with-current-buffer todotxt-buffer
         (write-region nil nil todotxt-file-name nil 0))
       (kill-buffer todotxt-buffer)
