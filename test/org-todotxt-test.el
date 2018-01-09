@@ -110,6 +110,8 @@ Make a copy of the input file into a staging area so that OrgMode can't change i
     (with-current-buffer (find-file-noselect org-todotxt-inbox-for-pull)
       (goto-char 1)
       (should (search-forward "* Brilliant todo PHB captures on mobile device" nil t))
+      ;; With a space
+      (should (= 2 (count-lines (point-min) (point-max))))
       (kill-buffer))))
 
 (ert-deftest org-todotxt-test--get-hash-of-active-org-tasks ()
