@@ -175,6 +175,20 @@ Uses the Org tags associated with this task."
     (goto-char (point-at-bol))
     (not (re-search-forward "org-id" (point-at-eol) t))))
 
+(org-todotxt--get-hash-of-active-org-tasks org-agenda-buffer)
+
+(defun org-todotxt--get-hash-of-active-org-tasks (some-org-buffer)
+  (setq so-much-imperative-list '())
+
+  (with-current-buffer some-org-buffer
+    (goto-char (point-min))
+    (iter-do (org-task-marker (iterate-over-tasks-in-org-agenda-buffer))
+              (org-todotxt--extract-info-from-org-line org-task-marker
+                                                       (lambda (headline-no-link project-name contexts maybe-id)
+                                                         (setq so-much-imperative-list (cons `(,headline-no-link . ,project-name)
+                                                                                              so-much-imperative-list))))))
+  (nreverse so-much-imperative-list))
+
 (defun org-todotxt-pull--new-task-from-line ()
   (goto-char (point-at-bol))
   (kill-line)

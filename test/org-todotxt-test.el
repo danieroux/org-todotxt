@@ -112,6 +112,13 @@ Make a copy of the input file into a staging area so that OrgMode can't change i
       (should (search-forward "* Brilliant todo PHB captures on mobile device" nil t))
       (kill-buffer))))
 
+(ert-deftest org-todotxt-test--get-hash-of-active-org-tasks ()
+  (org-todotxt--test-create-agenda)
+  (let ((active-tasks (org-todotxt--get-hash-of-active-org-tasks org-agenda-buffer)))
+    (should (= 3 (list-length active-tasks)))
+    (should (equal "Build a rocket" (caar active-tasks)))
+    (should (equal "+GetToMars" (cdar active-tasks)))))
+
 (ert-deftest org-todotxt-test-pull--is-new-task-p ()
   (with-temp-buffer
     (insert "This is a new task")
